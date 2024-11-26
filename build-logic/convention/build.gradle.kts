@@ -27,5 +27,9 @@ gradlePlugin {
             id = "currencyexchange.android.library.compose"
             implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
+        register("jvmLibrary") {
+            id = "currencyexchange.jvm.library"
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
     }
 }

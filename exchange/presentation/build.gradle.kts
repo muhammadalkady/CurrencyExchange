@@ -1,18 +1,15 @@
 plugins {
-    alias(libs.plugins.currencyexchange.android.application.compose)
+    alias(libs.plugins.currencyexchange.android.library.compose)
 }
 
 android {
-    namespace = "com.kady.muhammad.currencyexchange"
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
+    namespace = "com.kady.muhammad.exchange.presentation"
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)

@@ -17,6 +17,8 @@ projectMinSdkVersion = "26"
 projectTargetSdkVersion = "35"
 projectCompileSdkVersion = "35"
 projectVersionCode = "1"
+appcompat = "1.7.0"
+material = "1.12.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +39,8 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -47,4 +51,6 @@ currencyexchange-android-application = { id = "currencyexchange.android.applicat
 currencyexchange-android-application-compose = { id = "currencyexchange.android.application.compose", version = "unspecified" }
 currencyexchange-android-library = { id = "currencyexchange.android.library", version = "unspecified" }
 currencyexchange-android-library-compose = { id = "currencyexchange.android.library.compose", version = "unspecified" }
+currencyexchange-jvm-library = { id = "currencyexchange.jvm.library", version = "unspecified" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 

@@ -26,3 +26,10 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "CurrencyExchange"
 include(":app")
+include(":exchange:domain")
+include(":exchange:data")
+include(":exchange:presentation")
+include(":exchange:network")
+include(":core:domain")
+include(":core:data")
+include(":core:presentation")
