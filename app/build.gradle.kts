@@ -1,5 +1,8 @@
 plugins {
     alias(libs.plugins.currencyexchange.android.application.compose)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -17,6 +20,25 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+}
+
+dependencies {
+    implementation(libs.hiltAndroid)
+    ksp(libs.hiltAndroidCompiler)
+}
+
+
+dependencies {
+    implementation(projects.core.domain)
+    implementation(projects.core.data)
+    implementation(projects.core.presentation)
+    implementation(projects.exchange.domain)
+    implementation(projects.exchange.data)
+    implementation(projects.exchange.presentation)
+    implementation(projects.exchange.network)
+}
+
+dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

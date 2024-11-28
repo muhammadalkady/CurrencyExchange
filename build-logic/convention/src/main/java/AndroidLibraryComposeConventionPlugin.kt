@@ -12,6 +12,9 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
                 val currencyExchangeAndroidLibraryPlugin =
                     libs.findPlugin("currencyexchange-android-library").get()
                 apply(currencyExchangeAndroidLibraryPlugin.get().pluginId)
+                val composeCompilerPlugin = libs.findPlugin("kotlin-compose").get()
+                val composeCompilerPluginId = composeCompilerPlugin.get().pluginId
+                pluginManager.apply(composeCompilerPluginId)
             }
             extensions.configure<LibraryExtension> {
                 configureAndroidCompose(this)

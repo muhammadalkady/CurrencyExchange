@@ -1,1 +1,1 @@
-git diff > diff.txt
+git diff --cached > diff.txt

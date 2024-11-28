@@ -13,6 +13,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         target.run {
             pluginManager.run {
                 apply("com.android.library")
+                apply("org.jetbrains.kotlin.android")
             }
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
