@@ -25,6 +25,7 @@ dependencies {
 
 dependencies {
     implementation(projects.core.domain)
+    implementation(projects.exchange.domain)
 }
 
 

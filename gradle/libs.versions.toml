@@ -23,9 +23,11 @@ material = "1.12.0"
 retrofit = "2.11.0"
 retrofitSerializationConverter = "1.0.0"
 
-ksp = "2.0.21-1.0.25"
+ksp = "2.0.21-1.0.28"
 
 hilt = "2.52"
+hiltNavigationCompose = "1.2.0"
+hiltLifeCycleViewModelCompose = "2.8.7"
 
 projectApplicationId = "com.kady.muhammad.currencyexchange"
 projectVersionName = "1.0"
@@ -60,6 +62,8 @@ material = { group = "com.google.android.material", name = "material", version.r
 # Dagger Hilt Libraries
 hiltAndroid = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hiltAndroidCompiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+hiltNavigationCompose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+hiltLifeCycleViewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "hiltLifeCycleViewModelCompose" }
 
 # KotlinX Libraries
 coroutinesAndroid = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutinesAndroid" }

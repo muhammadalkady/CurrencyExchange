@@ -44,7 +44,7 @@ internal fun Project.configureBuildTypes(
 
 private fun BuildType.configureDebugBuildType(apiKey: String) {
     buildConfigField("String", "API_KEY", "\"$apiKey\"")
-    buildConfigField("String", "BASE_URL", "\"https://data.fixer.io/api\"")
+    buildConfigField("String", "BASE_URL", "\"https://data.fixer.io/api/\"")
 }
 
 
@@ -53,7 +53,7 @@ private fun BuildType.configureReleaseBuildType(
     apiKey: String,
 ) {
     buildConfigField("String", "API_KEY", "\"$apiKey\"")
-    buildConfigField("String", "BASE_URL", "\"https://data.fixer.io/api\"")
+    buildConfigField("String", "BASE_URL", "\"https://data.fixer.io/api/\"")
     isMinifyEnabled = true
     proguardFiles(
         commonExtension.getDefaultProguardFile("proguard-android-optimize.txt"),

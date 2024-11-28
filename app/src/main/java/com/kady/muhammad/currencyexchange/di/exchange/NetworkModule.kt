@@ -1,9 +1,8 @@
-package com.kady.muhammad.currencyexchange.di
+package com.kady.muhammad.currencyexchange.di.exchange
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.kady.muhammad.currencyexchange.BuildConfig
 import com.kady.muhammad.exchange.network.interceptors.ApiKeyInterceptor
-import com.kady.muhammad.exchange.network.service.CurrencyExchangeService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -52,10 +51,6 @@ object NetworkModule {
         converterFactory: Converter.Factory
     ): Retrofit = Retrofit.Builder().client(okHttpClient).baseUrl(baseUrl)
         .addConverterFactory(converterFactory).build()
-
-    @Provides
-    fun providesCurrencyExchangeService(retrofit: Retrofit): CurrencyExchangeService =
-        retrofit.create(CurrencyExchangeService::class.java)
 
     @Provides
     @Named(BASE_URL)
