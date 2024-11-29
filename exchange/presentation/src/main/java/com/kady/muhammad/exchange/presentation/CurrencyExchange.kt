@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -60,96 +63,194 @@ fun CurrencyExchangeScreen(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        val context = LocalContext.current
         when (state.status) {
-            is UiCurrencyExchangeStatus.Error           -> {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = state.status.error.toString(context = context),
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = onRetry) {
-                        Text("RETRY")
-                    }
-                }
+            is UiCurrencyExchangeStatus.Error -> {
+                CurrencyExchangeError(
+                    errorMessage = state.status.error.toString(LocalContext.current),
+                    onRetry = onRetry
+                )
             }
 
-            UiCurrencyExchangeStatus.Idle,
-            UiCurrencyExchangeStatus.LoadingCurrencies  -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+            UiCurrencyExchangeStatus.Idle, UiCurrencyExchangeStatus.LoadingCurrencies -> {
+                CurrencyExchangeLoading()
             }
 
             UiCurrencyExchangeStatus.LoadedCurrencies,
             UiCurrencyExchangeStatus.LoadingExchangeRate,
             UiCurrencyExchangeStatus.LoadedExchangeRate -> {
-                CurrencySection(
-                    label = "Amount",
-                    state.symbols,
-                    selectedCurrency = state.sourceCurrencySymbol,
-                    onCurrencySelected = onSourceCurrencySelected,
-                    amount = state.sourceAmount,
-                    onAmountChanged = onSourceAmountChanged,
-                    isEditable = true
+                CurrencyExchangeContent(
+                    state = state,
+                    onSourceCurrencySelected = onSourceCurrencySelected,
+                    onTargetCurrencySelected = onTargetCurrencySelected,
+                    onSourceAmountChanged = onSourceAmountChanged,
+                    onSwap = onSwap,
+                    calculateExchangeRate = calculateExchangeRate
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.ic_swap), // Replace with your arrow icon resource
-                    contentDescription = null,
-                    modifier = Modifier
-                        .clickable(onClick = onSwap)
-                        .align(Alignment.CenterHorizontally)
-                        .size(64.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                CurrencySection(
-                    label = "Converted Amount",
-                    state.symbols,
-                    selectedCurrency = state.targetCurrencySymbol,
-                    onCurrencySelected = onTargetCurrencySelected,
-                    amount = state.targetAmount?.toString() ?: "",
-                    isEditable = false
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .animateContentSize(),
-                    onClick = {
-                        val sourceAmount = state.sourceAmount?.toDoubleOrNull()
-                        if (sourceAmount != null) {
-                            calculateExchangeRate(sourceAmount)
-                        }
-
-                    },
-                    enabled = state.status == UiCurrencyExchangeStatus.LoadedExchangeRate || state.status == UiCurrencyExchangeStatus.LoadedCurrencies
-                ) {
-                    Row {
-                        Text("CALCULATE")
-                        if (state.status == UiCurrencyExchangeStatus.LoadingExchangeRate) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            CircularProgressIndicator(
-                                strokeWidth = 1.dp, modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                }
-
             }
         }
     }
+}
+
+@Composable
+fun CurrencyExchangeError(
+    errorMessage: String,
+    onRetry: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = errorMessage, textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onRetry) {
+            Text("RETRY") // Button text
+        }
+    }
+}
+
+@Composable
+fun CurrencyExchangeLoading() {
+    // Box layout for centering the spinner in the available space
+    Box(
+        modifier = Modifier.fillMaxSize(), // Fill the entire available space
+        contentAlignment = Alignment.Center, // Center the content inside the Box
+    ) {
+        CircularProgressIndicator() // Display a circular progress indicator (spinner)
+    }
+}
+
+@Composable
+fun ColumnScope.CurrencyExchangeContent(
+    state: UiCurrencyExchangeState,
+    onSourceCurrencySelected: (UiCurrencySymbolModel) -> Unit,
+    onTargetCurrencySelected: (UiCurrencySymbolModel) -> Unit,
+    onSourceAmountChanged: (String) -> Unit,
+    onSwap: () -> Unit,
+    calculateExchangeRate: (Double) -> Unit
+) {
+    CurrencySection(
+        label = "Amount",
+        currencies = state.symbols,
+        selectedCurrency = state.sourceCurrencySymbol,
+        onCurrencySelected = onSourceCurrencySelected,
+        amount = state.sourceAmount,
+        onAmountChanged = onSourceAmountChanged,
+        isEditable = true
+    )
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Image(
+        painter = painterResource(id = R.drawable.ic_swap),
+        contentDescription = null,
+        modifier = Modifier
+            .clip(CircleShape)
+            .clickable(onClick = onSwap)
+            .align(Alignment.CenterHorizontally)
+            .size(64.dp)
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    CurrencySection(
+        label = "Converted Amount",
+        currencies = state.symbols,
+        selectedCurrency = state.targetCurrencySymbol,
+        onCurrencySelected = onTargetCurrencySelected,
+        amount = state.targetAmount?.toString() ?: "",
+        isEditable = false
+    )
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    CalculateButton(
+        state = state, calculateExchangeRate = calculateExchangeRate
+    )
+}
+
+@Composable
+fun ColumnScope.CalculateButton(
+    state: UiCurrencyExchangeState, calculateExchangeRate: (Double) -> Unit
+) {
+    Button(
+        modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .animateContentSize(),
+        onClick = {
+            val sourceAmount = state.sourceAmount?.toDoubleOrNull()
+            if (sourceAmount != null) {
+                calculateExchangeRate(sourceAmount)
+            }
+        },
+        enabled = state.status == UiCurrencyExchangeStatus.LoadedExchangeRate || state.status == UiCurrencyExchangeStatus.LoadedCurrencies
+    ) {
+        Row {
+            Text("CALCULATE")
+            if (state.status == UiCurrencyExchangeStatus.LoadingExchangeRate) {
+                Spacer(modifier = Modifier.width(8.dp))
+                CircularProgressIndicator(
+                    strokeWidth = 1.dp, modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CurrencyDropdown(
+    selectedCurrency: UiCurrencySymbolModel,
+    currencies: List<UiCurrencySymbolModel>,
+    expanded: Boolean,
+    modifier: Modifier = Modifier,
+    onCurrencySelected: (UiCurrencySymbolModel) -> Unit,
+    onExpandedChange: (Boolean) -> Unit,
+) {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
+    ) {
+        OutlinedTextField(
+            value = selectedCurrency.symbol,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Currency") },
+            trailingIcon = { TrailingIcon(expanded = expanded) },
+            modifier = modifier
+                .width(140.dp)
+                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
+        )
+
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
+            currencies.forEach { currency ->
+                DropdownMenuItem(text = { Text(text = "${currency.flagEmoji} ${currency.symbol}") },
+                    onClick = {
+                        onExpandedChange(false)
+                        onCurrencySelected(currency)
+                    })
+            }
+        }
+    }
+}
+
+@Composable
+fun AmountInput(
+    amount: String?,
+    isEditable: Boolean,
+    modifier: Modifier = Modifier,
+    onAmountChanged: (String) -> Unit,
+) {
+    OutlinedTextField(
+        value = amount ?: "",
+        onValueChange = onAmountChanged,
+        label = { Text("Amount") },
+        enabled = isEditable,
+        textStyle = MaterialTheme.typography.titleLarge,
+        modifier = modifier,
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+    )
 }
 
 @Composable
@@ -163,7 +264,6 @@ fun CurrencySection(
     onCurrencySelected: (UiCurrencySymbolModel) -> Unit = {},
     isEditable: Boolean = true,
 ) {
-
     var expanded by remember { mutableStateOf(false) }
 
     Column(
@@ -181,48 +281,23 @@ fun CurrencySection(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Currency Dropdown
-            ExposedDropdownMenuBox(
+            CurrencyDropdown(
+                selectedCurrency = selectedCurrency,
+                currencies = currencies,
                 expanded = expanded,
-                onExpandedChange = { expanded = !expanded }) {
-                OutlinedTextField(
-                    value = selectedCurrency.symbol,
-                    onValueChange = { },
-                    readOnly = true,
-                    label = { Text("Currency") },
-                    trailingIcon = {
-                        TrailingIcon(expanded = expanded)
-                    },
-
-                    modifier = Modifier
-                        .width(140.dp)
-                        .menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
-                )
-
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    currencies.forEach { currency ->
-                        DropdownMenuItem(text = { Text(text = "${currency.flagEmoji} ${currency.symbol}") },
-                            onClick = {
-                                expanded = false
-                                onCurrencySelected(currency)
-                            })
-                    }
-                }
-            }
+                onCurrencySelected = onCurrencySelected,
+                onExpandedChange = { expanded = it },
+                modifier = Modifier.weight(1f)
+            )
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            OutlinedTextField(
-                value = amount ?: "",
-                onValueChange = onAmountChanged,
-                label = { Text("Amount") },
-                enabled = isEditable,
-                textStyle = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            AmountInput(
+                amount = amount,
+                onAmountChanged = onAmountChanged,
+                isEditable = isEditable,
+                modifier = Modifier.weight(1f)
             )
         }
     }
 }
-
