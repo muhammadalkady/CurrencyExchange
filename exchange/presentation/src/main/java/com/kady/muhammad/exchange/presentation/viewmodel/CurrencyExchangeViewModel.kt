@@ -188,8 +188,8 @@ class CurrencyExchangeViewModel @Inject constructor(
         _state.update {
             it.copy(
                 // Swap source and target amounts
-                sourceAmount = it.targetAmount?.toString() ?: "",
-                targetAmount = it.sourceAmount?.toDoubleOrNull() ?: 0.0,
+                sourceAmount = it.targetAmount?.toString() ?: "1.0",
+                targetAmount = null,
                 // Swap source and target exchange rates
                 sourceCurrencyExchangeRate = it.targetCurrencyExchangeRate,
                 targetCurrencyExchangeRate = it.sourceCurrencyExchangeRate,
