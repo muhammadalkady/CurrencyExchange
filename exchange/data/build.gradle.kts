@@ -14,9 +14,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-}
 
-dependencies {
     implementation(projects.core.domain)
     implementation(projects.exchange.domain)
     implementation(projects.exchange.network)

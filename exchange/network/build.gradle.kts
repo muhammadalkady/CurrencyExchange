@@ -11,25 +11,16 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-}
 
-dependencies {
     implementation(libs.coroutinesAndroid)
-}
 
-dependencies {
     api(libs.retrofit)
     api(libs.retrofitSerializationConverter)
     api(libs.serializationJson)
-}
 
-dependencies {
     implementation(projects.core.domain)
     implementation(projects.exchange.domain)
-}
 
-
-dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

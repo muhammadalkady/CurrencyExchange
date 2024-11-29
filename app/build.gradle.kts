@@ -21,16 +21,12 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-}
 
-dependencies {
     implementation(libs.hiltAndroid)
     implementation(libs.hiltNavigationCompose)
     implementation(libs.hiltLifeCycleViewModelCompose)
     ksp(libs.hiltAndroidCompiler)
-}
 
-dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.data)
     implementation(projects.core.presentation)
@@ -38,9 +34,7 @@ dependencies {
     implementation(projects.exchange.data)
     implementation(projects.exchange.presentation)
     implementation(projects.exchange.network)
-}
 
-dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

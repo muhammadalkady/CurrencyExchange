@@ -24,6 +24,7 @@ internal fun Project.configureBuildTypes(
                     }
                     release {
                         configureReleaseBuildType(commonExtension, apiKey)
+                        signingConfig = signingConfigs.getByName("debug")
                     }
                 }
             }
@@ -35,6 +36,9 @@ internal fun Project.configureBuildTypes(
                     }
                     release {
                         configureReleaseBuildType(commonExtension, apiKey)
+                        // Let app module minify the release build
+                        // Check https://developer.android.com/build/releases/past-releases/agp-8-4-0-release-notes#library-classes-shrunk
+                        isMinifyEnabled = false
                     }
                 }
             }
