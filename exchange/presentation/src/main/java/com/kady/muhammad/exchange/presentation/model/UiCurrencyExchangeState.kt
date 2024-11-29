@@ -27,7 +27,8 @@ data class UiCurrencyExchangeState(
 @Immutable
 sealed interface UiCurrencyExchangeStatus {
     data object Idle : UiCurrencyExchangeStatus
-    data object Loading : UiCurrencyExchangeStatus
+    data object LoadingCurrencies : UiCurrencyExchangeStatus
+    data object LoadingExchangeRate : UiCurrencyExchangeStatus
     data object Success : UiCurrencyExchangeStatus
     data class Error(val error: DataError.Network) : UiCurrencyExchangeStatus
 }

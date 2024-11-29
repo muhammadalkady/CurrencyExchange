@@ -2,6 +2,7 @@
 
 package com.kady.muhammad.exchange.presentation
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,7 +60,7 @@ fun CurrencyExchangeScreen(
     ) {
         val context = LocalContext.current
         when (state.status) {
-            is UiCurrencyExchangeStatus.Error -> {
+            is UiCurrencyExchangeStatus.Error                                              -> {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
@@ -76,7 +77,7 @@ fun CurrencyExchangeScreen(
                 }
             }
 
-            UiCurrencyExchangeStatus.Idle, UiCurrencyExchangeStatus.Loading -> {
+            UiCurrencyExchangeStatus.Idle, UiCurrencyExchangeStatus.LoadingCurrencies      -> {
                 Box(
                     modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                 ) {
@@ -84,7 +85,7 @@ fun CurrencyExchangeScreen(
                 }
             }
 
-            UiCurrencyExchangeStatus.Success -> {
+            UiCurrencyExchangeStatus.Success, UiCurrencyExchangeStatus.LoadingExchangeRate -> {
                 CurrencySection(
                     label = "Amount",
                     state.symbols,
@@ -114,16 +115,31 @@ fun CurrencyExchangeScreen(
                     isEditable = false
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                Button(onClick = {
+                Button(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .animateContentSize(),
+                    onClick = {
+                        val sourceAmount = state.sourceAmount?.toDoubleOrNull()
+                        if (sourceAmount != null) {
+                            calculateExchangeRate(sourceAmount)
+                        }
 
-                    val sourceAmount = state.sourceAmount?.toDoubleOrNull()
-                    if (sourceAmount != null) {
-                        calculateExchangeRate(sourceAmount)
+                    },
+                    enabled = state.status == UiCurrencyExchangeStatus.Success
+                ) {
+                    Row {
+                        Text("CALCULATE")
+                        if (state.status == UiCurrencyExchangeStatus.LoadingExchangeRate) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            CircularProgressIndicator(
+                                strokeWidth = 1.dp, modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
-
-                }) { Text("CALCULATE") }
+                }
 
             }
         }
@@ -160,8 +176,7 @@ fun CurrencySection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Currency Dropdown
-            ExposedDropdownMenuBox(
-                expanded = expanded,
+            ExposedDropdownMenuBox(expanded = expanded,
                 onExpandedChange = { expanded = !expanded }) {
                 OutlinedTextField(
                     value = selectedCurrency.symbol,
@@ -177,9 +192,7 @@ fun CurrencySection(
                         .menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
                 )
 
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }) {
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     currencies.forEach { currency ->
                         DropdownMenuItem(text = { Text(text = "${currency.flagEmoji} ${currency.symbol}") },
                             onClick = {
@@ -199,6 +212,7 @@ fun CurrencySection(
                 enabled = isEditable,
                 textStyle = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.weight(1f),
+                maxLines = 1,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
         }
