@@ -65,20 +65,18 @@ fun CurrencyExchangeScreen(
             .padding(16.dp)
     ) {
         when (state.status) {
-            is UiCurrencyExchangeStatus.Error -> {
+            is UiCurrencyExchangeStatus.Error                                                                                                    -> {
                 CurrencyExchangeError(
                     errorMessage = state.status.error.toString(LocalContext.current),
                     onRetry = onRetry
                 )
             }
 
-            UiCurrencyExchangeStatus.Idle, UiCurrencyExchangeStatus.LoadingCurrencies -> {
+            UiCurrencyExchangeStatus.Idle, UiCurrencyExchangeStatus.LoadingCurrencies                                                            -> {
                 CurrencyExchangeLoading()
             }
 
-            UiCurrencyExchangeStatus.LoadedCurrencies,
-            UiCurrencyExchangeStatus.LoadingExchangeRate,
-            UiCurrencyExchangeStatus.LoadedExchangeRate -> {
+            UiCurrencyExchangeStatus.LoadedCurrencies, UiCurrencyExchangeStatus.LoadingExchangeRate, UiCurrencyExchangeStatus.LoadedExchangeRate -> {
                 CurrencyExchangeContent(
                     state = state,
                     onSourceCurrencySelected = onSourceCurrencySelected,
@@ -143,13 +141,18 @@ fun ColumnScope.CurrencyExchangeContent(
     )
     Spacer(modifier = Modifier.height(16.dp))
 
+    val isCurrencyExchangeLoading = state.status == UiCurrencyExchangeStatus.LoadingExchangeRate
+    val backgroundColor =
+        if (isCurrencyExchangeLoading) MaterialTheme.colorScheme.onSurface.copy(
+            alpha = 0.12F
+        ) else MaterialTheme.colorScheme.primary
     Image(
         painter = painterResource(id = R.drawable.ic_swap),
         contentDescription = null,
         modifier = Modifier
             .clip(CircleShape)
-            .clickable(onClick = onSwap)
-            .background(MaterialTheme.colorScheme.primary)
+            .then(if (isCurrencyExchangeLoading) Modifier else Modifier.clickable(onClick = onSwap))
+            .background(backgroundColor)
             .align(Alignment.CenterHorizontally)
             .size(64.dp)
     )
@@ -188,7 +191,10 @@ fun ColumnScope.CalculateButton(
         },
         enabled = state.status == UiCurrencyExchangeStatus.LoadedExchangeRate || state.status == UiCurrencyExchangeStatus.LoadedCurrencies
     ) {
-        Row {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
             Text("CALCULATE")
             if (state.status == UiCurrencyExchangeStatus.LoadingExchangeRate) {
                 Spacer(modifier = Modifier.width(8.dp))
