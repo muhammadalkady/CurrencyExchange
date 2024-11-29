@@ -4,6 +4,7 @@ package com.kady.muhammad.exchange.presentation
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -148,6 +149,7 @@ fun ColumnScope.CurrencyExchangeContent(
         modifier = Modifier
             .clip(CircleShape)
             .clickable(onClick = onSwap)
+            .background(MaterialTheme.colorScheme.primary)
             .align(Alignment.CenterHorizontally)
             .size(64.dp)
     )
