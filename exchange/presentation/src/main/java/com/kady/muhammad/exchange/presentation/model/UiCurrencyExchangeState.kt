@@ -29,6 +29,7 @@ sealed interface UiCurrencyExchangeStatus {
     data object Idle : UiCurrencyExchangeStatus
     data object LoadingCurrencies : UiCurrencyExchangeStatus
     data object LoadingExchangeRate : UiCurrencyExchangeStatus
-    data object Success : UiCurrencyExchangeStatus
+    data object LoadedCurrencies : UiCurrencyExchangeStatus
+    data object LoadedExchangeRate : UiCurrencyExchangeStatus
     data class Error(val error: DataError.Network) : UiCurrencyExchangeStatus
 }

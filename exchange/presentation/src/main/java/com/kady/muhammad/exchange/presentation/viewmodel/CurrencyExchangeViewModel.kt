@@ -126,7 +126,7 @@ class CurrencyExchangeViewModel @Inject constructor(
         updateStateLoadingExchangeRate()
         currencyExchangeDataSource.getExchangeRate(source, target).onSuccess { rate ->
             updateStateWithExchangeRate(rate)
-        }.onError { handleError(it) }
+        }.onError { sendLoadExchangeErrorEvent(it) }
     }
 
 
@@ -140,6 +140,20 @@ class CurrencyExchangeViewModel @Inject constructor(
      */
     private suspend fun handleError(error: DataError.Network) {
         _state.update { it.copy(status = UiCurrencyExchangeStatus.Error(error)) }
+        _events.send(CurrencyExchangeEvent.Error(error))
+    }
+
+    /**
+     * Sends an error event when loading the exchange rate fails and resets the state.
+     *
+     * This function updates the state to reset the status to `LoadedCurrencies`, which signifies
+     * the end of the loading operation (even though the exchange rate loading failed). It then
+     * sends a network error event to the UI with the provided `DataError.Network` details.
+     *
+     * @param error The network error to be sent as an event to the UI.
+     */
+    private suspend fun sendLoadExchangeErrorEvent(error: DataError.Network) {
+        _state.update { it.copy(status = UiCurrencyExchangeStatus.LoadedCurrencies) }
         _events.send(CurrencyExchangeEvent.Error(error))
     }
 
@@ -158,6 +172,31 @@ class CurrencyExchangeViewModel @Inject constructor(
             is CurrencyExchangeAction.UpdateSourceCurrency  -> updateSourceCurrency(action.symbol)
             is CurrencyExchangeAction.UpdateTargetCurrency  -> updateTargetCurrency(action.symbol)
             is CurrencyExchangeAction.UpdateSourceAmount    -> updateSourceAmount(action.amount)
+            CurrencyExchangeAction.SwapCurrencies           -> swapCurrencies()
+        }
+    }
+
+    /**
+     * Swaps the source and target currencies in the state.
+     *
+     * This function updates the state to swap the source and target currencies, along with
+     * their respective amounts and exchange rates. The source amount is updated to the current
+     * target amount, and the target amount is updated based on the current source amount.
+     * The corresponding exchange rates and currency symbols are also swapped.
+     */
+    private fun swapCurrencies() {
+        _state.update {
+            it.copy(
+                // Swap source and target amounts
+                sourceAmount = it.targetAmount?.toString() ?: "",
+                targetAmount = it.sourceAmount?.toDoubleOrNull() ?: 0.0,
+                // Swap source and target exchange rates
+                sourceCurrencyExchangeRate = it.targetCurrencyExchangeRate,
+                targetCurrencyExchangeRate = it.sourceCurrencyExchangeRate,
+                // Swap source and target currency symbols
+                sourceCurrencySymbol = it.targetCurrencySymbol,
+                targetCurrencySymbol = it.sourceCurrencySymbol
+            )
         }
     }
 
@@ -182,39 +221,39 @@ class CurrencyExchangeViewModel @Inject constructor(
     }
 
     /**
-     * Updates the UI state with the fetched list of currency symbols.
+     * Updates the state with the loaded list of currency symbols.
      *
-     * The function:
-     * - Sets the `status` to `Success`, indicating the operation completed successfully.
-     * - Populates the `symbols` field with the fetched and mapped list of UI models.
+     * This function updates the UI state to indicate that the currency symbols have been successfully
+     * loaded by setting the status to `LoadedCurrencies`. It also stores the list of currency symbols
+     * in the state.
      *
-     * @param symbols The list of currency symbols converted to UI models.
+     * @param symbols A list of UI currency symbols to be stored in the state.
      */
     private fun updateStateWithSymbols(symbols: List<UiCurrencySymbolModel>) {
         _state.update {
             it.copy(
-                status = UiCurrencyExchangeStatus.Success, symbols = symbols.toImmutableList()
+                status = UiCurrencyExchangeStatus.LoadedCurrencies,
+                symbols = symbols.toImmutableList()
             )
         }
     }
 
     /**
-     * Updates the UI state with the fetched exchange rate and its derived values.
+     * Updates the state with the loaded exchange rate information.
      *
-     * The function:
-     * - Sets the `status` to `Success`, indicating the operation completed successfully.
-     * - Updates the `sourceCurrencyExchangeRate` and `targetCurrencyExchangeRate` fields
-     *   with the converted exchange rate models.
-     * - Calculates the `targetAmount` using the source amount and the exchange rate.
+     * This function updates the UI state to indicate that the exchange rate has been successfully
+     * loaded by setting the status to `LoadedExchangeRate`. It also updates the source and target
+     * currency exchange rates in the state and calculates the target amount based on the current
+     * source amount and the exchange rate.
      *
-     * @param rate The exchange rate fetched from the data source.
+     * @param rate The loaded exchange rate model to be used in the state update.
      */
     private fun updateStateWithExchangeRate(rate: DomainCurrencyRateModel) {
         _state.update { currentState ->
             val sourceRate = rate.toSourceUiModel()
             val targetRate = rate.toTargetUiModel()
             currentState.copy(
-                status = UiCurrencyExchangeStatus.Success,
+                status = UiCurrencyExchangeStatus.LoadedExchangeRate,
                 sourceCurrencyExchangeRate = sourceRate,
                 targetCurrencyExchangeRate = targetRate,
                 targetAmount = calculateTargetAmount(

@@ -5,5 +5,6 @@ sealed interface CurrencyExchangeAction {
     data class UpdateSourceCurrency(val symbol: UiCurrencySymbolModel) : CurrencyExchangeAction
     data class UpdateTargetCurrency(val symbol: UiCurrencySymbolModel) : CurrencyExchangeAction
     data class UpdateSourceAmount(val amount: String?) : CurrencyExchangeAction
+    data object SwapCurrencies : CurrencyExchangeAction
     data class CalculateExchangeRate(val sourceAmount: Double) : CurrencyExchangeAction
 }

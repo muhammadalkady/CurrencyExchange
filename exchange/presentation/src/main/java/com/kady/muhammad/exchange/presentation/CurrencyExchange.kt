@@ -4,6 +4,7 @@ package com.kady.muhammad.exchange.presentation
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ fun CurrencyExchangeScreen(
     onTargetCurrencySelected: (UiCurrencySymbolModel) -> Unit = {},
     onSourceAmountChanged: (String) -> Unit = {},
     calculateExchangeRate: (Double) -> Unit = {},
+    onSwap: () -> Unit = {},
     onRetry: (() -> Unit) = { },
 ) {
     Column(
@@ -60,7 +62,7 @@ fun CurrencyExchangeScreen(
     ) {
         val context = LocalContext.current
         when (state.status) {
-            is UiCurrencyExchangeStatus.Error                                              -> {
+            is UiCurrencyExchangeStatus.Error           -> {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
@@ -72,12 +74,13 @@ fun CurrencyExchangeScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = onRetry) {
-                        Text("Retry")
+                        Text("RETRY")
                     }
                 }
             }
 
-            UiCurrencyExchangeStatus.Idle, UiCurrencyExchangeStatus.LoadingCurrencies      -> {
+            UiCurrencyExchangeStatus.Idle,
+            UiCurrencyExchangeStatus.LoadingCurrencies  -> {
                 Box(
                     modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                 ) {
@@ -85,7 +88,9 @@ fun CurrencyExchangeScreen(
                 }
             }
 
-            UiCurrencyExchangeStatus.Success, UiCurrencyExchangeStatus.LoadingExchangeRate -> {
+            UiCurrencyExchangeStatus.LoadedCurrencies,
+            UiCurrencyExchangeStatus.LoadingExchangeRate,
+            UiCurrencyExchangeStatus.LoadedExchangeRate -> {
                 CurrencySection(
                     label = "Amount",
                     state.symbols,
@@ -100,6 +105,7 @@ fun CurrencyExchangeScreen(
                     painter = painterResource(id = R.drawable.ic_swap), // Replace with your arrow icon resource
                     contentDescription = null,
                     modifier = Modifier
+                        .clickable(onClick = onSwap)
                         .align(Alignment.CenterHorizontally)
                         .size(64.dp)
                 )
@@ -128,7 +134,7 @@ fun CurrencyExchangeScreen(
                         }
 
                     },
-                    enabled = state.status == UiCurrencyExchangeStatus.Success
+                    enabled = state.status == UiCurrencyExchangeStatus.LoadedExchangeRate || state.status == UiCurrencyExchangeStatus.LoadedCurrencies
                 ) {
                     Row {
                         Text("CALCULATE")
@@ -176,7 +182,8 @@ fun CurrencySection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Currency Dropdown
-            ExposedDropdownMenuBox(expanded = expanded,
+            ExposedDropdownMenuBox(
+                expanded = expanded,
                 onExpandedChange = { expanded = !expanded }) {
                 OutlinedTextField(
                     value = selectedCurrency.symbol,

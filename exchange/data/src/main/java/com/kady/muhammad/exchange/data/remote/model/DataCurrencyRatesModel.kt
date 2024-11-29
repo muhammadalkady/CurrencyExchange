@@ -20,12 +20,11 @@ data class DataCurrencyRatesModel(
  *
  * @return [DomainCurrencyRateModel] the domain model representing the currency rates.
  *
- * @throws IllegalArgumentException if the rates list contains fewer than two elements.
  */
 fun DataCurrencyRatesModel.toDomainModel(): DomainCurrencyRateModel {
-    require(rates.size >= 2) { "Rates list must contain at least two elements" }
     val (sourceCurrencySymbol, sourceCurrencyRate) = rates.toList()[0]
-    val (targetCurrencySymbol, targetCurrencyRate) = rates.toList()[1] // Fixed index to refer to the second element
+    val (targetCurrencySymbol, targetCurrencyRate) = rates.toList()
+        .getOrElse(1) { rates.toList()[0] }
     val sourceRate = targetCurrencyRate / sourceCurrencyRate
     val targetRate = sourceCurrencyRate / targetCurrencyRate
     return DomainCurrencyRateModel(
