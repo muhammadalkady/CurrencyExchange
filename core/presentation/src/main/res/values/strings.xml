@@ -1,0 +1,8 @@
+<resources>
+    <string name="data_error_network_request_timeout">Request timed out. Please try again.</string>
+    <string name="data_error_network_too_many_requests">Too many requests. Please wait and try again later.</string>
+    <string name="data_error_network_no_internet">No internet connection. Please check your network settings.</string>
+    <string name="data_error_network_server_error">Server error. Please try again later.</string>
+    <string name="data_error_network_serialization">An error occurred while processing the data. Please try again.</string>
+    <string name="data_error_network_unknown">Unknown error. Please try again.</string>
+</resources>

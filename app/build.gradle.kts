@@ -10,6 +10,7 @@ android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
 }
 
 dependencies {
@@ -28,7 +29,6 @@ dependencies {
     implementation(libs.hiltLifeCycleViewModelCompose)
     ksp(libs.hiltAndroidCompiler)
 }
-
 
 dependencies {
     implementation(projects.core.domain)

@@ -1,4 +1,4 @@
-package com.kady.muhammad.exchange.models
+package com.kady.muhammad.exchange.data.remote.model
 
 import com.kady.muhammad.exchnage.domain.model.DomainCurrencyModel
 import kotlinx.serialization.Serializable
@@ -16,7 +16,7 @@ data class DataSymbolsModel(
 fun DataSymbolsModel.toDomainModel(): List<DomainCurrencyModel> {
     return symbols.map { entry ->
         DomainCurrencyModel(
-            name = entry.key, symbol = entry.value,
+            name = entry.value, symbol = entry.key,
         )
     }
 }

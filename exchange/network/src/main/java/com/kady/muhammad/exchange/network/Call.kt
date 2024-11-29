@@ -2,7 +2,9 @@ package com.kady.muhammad.exchange.network
 
 import com.kady.muhammad.core.domain.error.DataError
 import com.kady.muhammad.core.domain.result.Result
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import retrofit2.Call
 import retrofit2.HttpException
@@ -21,9 +23,9 @@ import kotlin.coroutines.coroutineContext
  * @param callProvider A lambda function that provides the [Call] to be executed.
  * @return A [Result] containing the response body in case of success or an error in case of failure.
  */
-suspend inline fun <reified T> safeCall(callProvider: () -> Call<T>): Result<T, DataError.Network> {
+suspend inline fun <reified T> safeCall(crossinline callProvider: () -> Call<T>): Result<T, DataError.Network> {
     return try {
-        val retrofitResponse = callProvider().execute()
+        val retrofitResponse = withContext(Dispatchers.IO) { callProvider().execute() }
         if (retrofitResponse.isSuccessful) {
             val body = retrofitResponse.body()
             body?.let {
@@ -39,6 +41,7 @@ suspend inline fun <reified T> safeCall(callProvider: () -> Call<T>): Result<T, 
     } catch (e: HttpException) {
         mapHttpExceptionToResult(e)
     } catch (e: SerializationException) {
+        e.printStackTrace()
         Result.Error(DataError.Network.SERIALIZATION)
     } catch (e: Exception) {
         coroutineContext.ensureActive()

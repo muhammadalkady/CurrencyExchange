@@ -6,4 +6,8 @@ import com.kady.muhammad.exchnage.domain.model.DomainCurrencyModel
 
 interface CurrencyExchangeDataSource {
     suspend fun getSymbols(): Result<List<DomainCurrencyModel>, DataError.Network>
+    suspend fun getExchangeRate(
+        source: String,
+        target: String
+    ): Result<DomainCurrencyRateModel, DataError.Network>
 }

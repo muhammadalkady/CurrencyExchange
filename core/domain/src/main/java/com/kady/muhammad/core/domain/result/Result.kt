@@ -44,6 +44,22 @@ inline fun <T, E : Error, R> Result<T, E>.map(mapper: (T) -> R): Result<R, E> {
 }
 
 /**
+ * Flat-maps a [Result] object by transforming the successful result's data using the given [transform] function.
+ * If the [Result] is an error, it is returned unchanged.
+ *
+ * @param R The type of the transformed data.
+ * @param transform A function that transforms the success data of type [T] into another [Result] of type [R, E].
+ * @return A new [Result] containing the transformed data, or the original error.
+ */
+inline fun <T, R, E : DomainError> Result<T, E>.flatMap(
+    transform: (T) -> Result<R, E>
+): Result<R, E> = when (this) {
+    is Result.Success -> transform(this.data)
+    is Result.Error   -> Result.Error(error)
+}
+
+
+/**
  * Executes the given action if the result is a success.
  *
  * @param action The action to be executed with the successful result's data.
