@@ -1,26 +1,23 @@
 plugins {
-    alias(libs.plugins.currencyexchange.android.application.compose)
+    alias(libs.plugins.currencyexchange.android.library.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
-    namespace = "com.kady.muhammad.currencyexchange"
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
+    namespace = "com.kady.muhammad.history.presentation"
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    implementation(libs.kotlinxImmutableCollections)
 
     implementation(libs.hiltAndroid)
     implementation(libs.hiltNavigationCompose)
@@ -28,17 +25,8 @@ dependencies {
     ksp(libs.hiltAndroidCompiler)
 
     implementation(projects.core.domain)
-    implementation(projects.core.data)
     implementation(projects.core.presentation)
-
-    implementation(projects.exchange.domain)
-    implementation(projects.exchange.data)
-    implementation(projects.exchange.presentation)
-    implementation(projects.exchange.network)
-
     implementation(projects.history.domain)
-    implementation(projects.history.data)
-    implementation(projects.history.presentation)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
