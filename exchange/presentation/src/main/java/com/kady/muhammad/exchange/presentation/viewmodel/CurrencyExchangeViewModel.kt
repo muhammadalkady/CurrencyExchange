@@ -126,6 +126,14 @@ class CurrencyExchangeViewModel @Inject constructor(
         updateStateLoadingExchangeRate()
         currencyExchangeDataSource.getExchangeRate(source, target).onSuccess { rate ->
             updateStateWithExchangeRate(rate)
+            _events.send(
+                CurrencyExchangeEvent.CurrencyExchangeResult(
+                    sourceCurrencySymbol = state.value.sourceCurrencySymbol,
+                    targetCurrencySymbol = state.value.targetCurrencySymbol,
+                    sourceAmount = state.value.sourceAmount!!,
+                    targetAmount = "${state.value.targetAmount!!}"
+                )
+            )
         }.onError { sendLoadExchangeErrorEvent(it) }
     }
 

@@ -3,5 +3,6 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.coroutines)
     implementation(projects.core.domain)
 }

@@ -35,10 +35,9 @@ sealed interface Result<out T, out E : DomainError> {
     data class Error<out T, out E : DomainError>(val error: E) : Result<T, E>
 }
 
-
 inline fun <T, E : Error, R> Result<T, E>.map(mapper: (T) -> R): Result<R, E> {
     return when (this) {
-        is Result.Error   -> Result.Error(error)
+        is Result.Error -> Result.Error(error)
         is Result.Success -> Result.Success(mapper(data))
     }
 }
@@ -55,7 +54,7 @@ inline fun <T, R, E : DomainError> Result<T, E>.flatMap(
     transform: (T) -> Result<R, E>
 ): Result<R, E> = when (this) {
     is Result.Success -> transform(this.data)
-    is Result.Error   -> Result.Error(error)
+    is Result.Error -> Result.Error(error)
 }
 
 
@@ -67,7 +66,7 @@ inline fun <T, R, E : DomainError> Result<T, E>.flatMap(
  */
 inline fun <T, E : Error> Result<T, E>.onSuccess(action: (T) -> Unit): Result<T, E> {
     return when (this) {
-        is Result.Error   -> this
+        is Result.Error -> this
         is Result.Success -> {
             action(data)
             this
@@ -83,7 +82,7 @@ inline fun <T, E : Error> Result<T, E>.onSuccess(action: (T) -> Unit): Result<T,
  */
 inline fun <T, E : Error> Result<T, E>.onError(action: (E) -> Unit): Result<T, E> {
     return when (this) {
-        is Result.Error   -> {
+        is Result.Error -> {
             action(error)
             this
         }

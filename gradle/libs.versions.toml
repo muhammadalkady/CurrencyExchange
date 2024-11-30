@@ -1,6 +1,6 @@
 [versions]
 agp = "8.7.2"
-kotlin = "2.0.21"
+kotlin = "2.1.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -13,6 +13,7 @@ androidTools = "31.7.2"
 
 # KotlinX Libraries
 serializationJson = "1.7.3"
+coroutines = "1.9.0"
 coroutinesAndroid = "1.9.0"
 kotlinxImmutableCollections = "0.3.7"
 
@@ -23,11 +24,13 @@ material = "1.12.0"
 retrofit = "2.11.0"
 retrofitSerializationConverter = "1.0.0"
 
-ksp = "2.0.21-1.0.28"
+ksp = "2.1.0-1.0.29"
 
 hilt = "2.52"
 hiltNavigationCompose = "1.2.0"
 hiltLifeCycleViewModelCompose = "2.8.7"
+
+room = "2.6.1"
 
 projectApplicationId = "com.kady.muhammad.currencyexchange"
 projectVersionName = "1.0"
@@ -58,6 +61,9 @@ kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-pl
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 
 # Dagger Hilt Libraries
 hiltAndroid = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
@@ -66,6 +72,7 @@ hiltNavigationCompose = { group = "androidx.hilt", name = "hilt-navigation-compo
 hiltLifeCycleViewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "hiltLifeCycleViewModelCompose" }
 
 # KotlinX Libraries
+coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutinesAndroid = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutinesAndroid" }
 serializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serializationJson" }
 kotlinxImmutableCollections = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxImmutableCollections" }
@@ -84,6 +91,8 @@ jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrai
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+room = { id = "androidx.room", version.ref = "room" }
 
 currencyexchange-android-application = { id = "currencyexchange.android.application", version = "unspecified" }
 currencyexchange-android-application-compose = { id = "currencyexchange.android.application.compose", version = "unspecified" }

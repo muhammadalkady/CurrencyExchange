@@ -25,17 +25,20 @@ import com.kady.muhammad.exchange.presentation.viewmodel.CurrencyExchangeViewMod
  * @param modifier Optional [Modifier] to customize the layout and appearance of the component
  * @param viewModel The [CurrencyExchangeViewModel] that manages the business logic
  *                  and state for currency exchange operations
+ * @param onCurrencyExchangeResult Callback function to handle the result of a currency exchange
  *
  */
 @Composable
 fun CurrencyConverter(
-    modifier: Modifier = Modifier, viewModel: CurrencyExchangeViewModel = hiltViewModel()
+    modifier: Modifier = Modifier,
+    viewModel: CurrencyExchangeViewModel = hiltViewModel(),
+    onCurrencyExchangeResult: (CurrencyExchangeEvent.CurrencyExchangeResult) -> Unit = {}
 ) {
     // Observe the ViewModel's state and collect it with lifecycle awareness
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     // Handle any events emitted by the ViewModel (such as errors)
-    HandleViewModelEvents(viewModel)
+    HandleViewModelEvents(viewModel, onCurrencyExchangeResult)
 
     // Render the main currency exchange screen with all interactive elements
     CurrencyExchangeScreen(modifier = modifier,
@@ -55,10 +58,13 @@ fun CurrencyConverter(
  * toast messages for any error events that occur during currency exchange operations.
  *
  * @param viewModel The ViewModel to observe for events
+ * @param onCurrencyExchangeResult Callback function to handle the result of a currency exchange
  */
 @Composable
-private fun HandleViewModelEvents(viewModel: CurrencyExchangeViewModel) {
-    // Retrieve the current Android context for showing toast messages
+private fun HandleViewModelEvents(
+    viewModel: CurrencyExchangeViewModel,
+    onCurrencyExchangeResult: (CurrencyExchangeEvent.CurrencyExchangeResult) -> Unit = {}
+) {
     val context = LocalContext.current
 
     // Observe and react to events from the ViewModel
@@ -68,6 +74,8 @@ private fun HandleViewModelEvents(viewModel: CurrencyExchangeViewModel) {
             is CurrencyExchangeEvent.Error -> {
                 Toast.makeText(context, event.error.toString(context), Toast.LENGTH_SHORT).show()
             }
+
+            is CurrencyExchangeEvent.CurrencyExchangeResult -> onCurrencyExchangeResult(event)
         }
     }
 }

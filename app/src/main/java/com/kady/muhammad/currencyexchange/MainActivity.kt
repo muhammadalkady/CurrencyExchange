@@ -6,8 +6,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,7 +27,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.kady.muhammad.currencyexchange.ui.theme.CurrencyExchangeTheme
 import com.kady.muhammad.exchange.presentation.CurrencyConverter
+import com.kady.muhammad.exchange.presentation.model.CurrencyExchangeEvent
+import com.kady.muhammad.history.domain.model.DomainExchangeHistoryModel
 import com.kady.muhammad.history.presentation.ExchangeHistory
+import com.kady.muhammad.history.presentation.viewmodel.ExchangeHistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -35,6 +41,8 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val historyViewModel by viewModels<ExchangeHistoryViewModel>()
 
     /**
      * Called when the activity is starting. This is where most initialization should occur.
@@ -52,7 +60,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         // Set the root composable content for this activity.
         setContent {
-            CurrencyExchangeRoot()
+            CurrencyExchangeRoot(historyViewModel)
         }
     }
 }
@@ -60,17 +68,19 @@ class MainActivity : ComponentActivity() {
 /**
  * Root Composable function for the Currency Exchange application.
  *
+ * @param historyViewModel The ViewModel for managing exchange history.
+ *
  * This function serves as the entry point for the UI, applying the application's theme and
  * setting up the navigation graph.
  */
 @Composable
-fun CurrencyExchangeRoot() {
+fun CurrencyExchangeRoot(historyViewModel: ExchangeHistoryViewModel) {
     // Apply the CurrencyExchangeTheme to provide a consistent look and feel throughout the app.
     CurrencyExchangeTheme {
         // Create a NavController to manage app navigation.
         val navController = rememberNavController()
         // Set up the NavigationGraph to define available destinations and navigation behavior.
-        NavigationGraph(navController)
+        NavigationGraph(navController, historyViewModel)
     }
 }
 
@@ -78,20 +88,34 @@ fun CurrencyExchangeRoot() {
  * NavigationGraph defines the navigation structure of the application.
  *
  * @param navController The NavController used to navigate between screens.
+ * @param historyViewModel The ViewModel for managing exchange history.
  *
  * This function uses a NavHost to define the navigation graph, specifying the start destination
  * and all available composable destinations.
  */
 @Composable
-fun NavigationGraph(navController: NavHostController) {
+fun NavigationGraph(navController: NavHostController, historyViewModel: ExchangeHistoryViewModel) {
     NavHost(navController = navController, startDestination = "home") {
         // Home screen destination
         composable("home") {
-            HomeScreen(navController)
+            HomeScreen(navController, onCurrencyExchangeResult = { result ->
+                historyViewModel.add(
+                    DomainExchangeHistoryModel(
+                        sourceSymbol = result.sourceCurrencySymbol.symbol,
+                        targetSymbol = result.targetCurrencySymbol.symbol,
+                        sourceAmount = result.sourceAmount,
+                        targetAmount = result.targetAmount,
+                        timestamp = System.currentTimeMillis()
+                    )
+                )
+            })
         }
         // History screen destination
         composable("history") {
-            HistoryScreen()
+            HistoryScreen(
+                navController,
+                historyViewModel
+            )
         }
     }
 }
@@ -100,17 +124,24 @@ fun NavigationGraph(navController: NavHostController) {
  * HomeScreen displays the main currency conversion interface.
  *
  * @param navController The NavController used to navigate to other screens.
+ * @param onCurrencyExchangeResult Callback function to handle the result of a currency exchange.
  *
  * This screen uses a Scaffold to provide a consistent layout structure, including a top bar
  * and a content area for the currency converter.
  */
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(
+    navController: NavHostController,
+    onCurrencyExchangeResult: (CurrencyExchangeEvent.CurrencyExchangeResult) -> Unit = {}
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { HomeTopBar(navController) }) { innerPadding ->
         // The CurrencyConverter is padded to avoid overlapping with the top bar.
-        CurrencyConverter(modifier = Modifier.padding(innerPadding))
+        CurrencyConverter(
+            modifier = Modifier.padding(innerPadding),
+            onCurrencyExchangeResult = onCurrencyExchangeResult
+        )
     }
 }
 
@@ -137,11 +168,20 @@ fun HomeTopBar(navController: NavHostController) {
 /**
  * HistoryTopBar is the top bar displayed on the HistoryScreen.
  *
+ * @param navController The NavController used to navigate back to the home screen.
+ *
  * This top bar only includes a title specific to the Exchange History.
  */
 @Composable
-fun HistoryTopBar() {
-    TopAppBar(title = { Text(text = "Exchange History") })
+fun HistoryTopBar(navController: NavHostController) {
+    TopAppBar(title = { Text(text = "Exchange History") }, navigationIcon = {
+        IconButton(onClick = { navController.navigateUp() }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                contentDescription = "Back"
+            )
+        }
+    })
 }
 
 /**
@@ -151,9 +191,17 @@ fun HistoryTopBar() {
  * and a content area for displaying the exchange history.
  */
 @Composable
-fun HistoryScreen() {
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = { HistoryTopBar() }) { innerPadding ->
+fun HistoryScreen(
+    navController: NavHostController,
+    historyViewModel: ExchangeHistoryViewModel
+) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = { HistoryTopBar(navController) }) { innerPadding ->
         // The ExchangeHistory is padded to avoid overlapping with the top bar.
-        ExchangeHistory(modifier = Modifier.padding(innerPadding))
+        ExchangeHistory(
+            modifier = Modifier.padding(innerPadding),
+            viewModel = historyViewModel
+        )
     }
 }
